@@ -38,6 +38,15 @@ export function WalletConnector() {
     }
   }, [isConnected, refreshUserData])
 
+  const handleConnectWallet = async () => {
+    try {
+      await connectWallet()
+    } catch (error) {
+      console.error("Wallet connection error:", error)
+      // Error is already handled in the store
+    }
+  }
+
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`
   }
@@ -69,7 +78,7 @@ export function WalletConnector() {
         </CardHeader>
         <CardContent>
           <Button
-            onClick={connectWallet}
+            onClick={handleConnectWallet}
             disabled={isLoading}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
           >

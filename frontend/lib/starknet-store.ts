@@ -1,15 +1,15 @@
 "use client"
 
 import { create } from "zustand"
-// TODO: Fix wallet imports when deploying - temporarily using mock for build
-// import connect, { disconnect } from "get-starknet-core"
+import { connect, disconnect } from '@starknet-io/get-starknet'
 import { 
   Contract, 
   RpcProvider, 
   constants, 
   CallData, 
   cairo,
-  shortString
+  shortString,
+  WalletAccount
 } from "starknet"
 
 interface LeaderboardEntry {
@@ -203,23 +203,17 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
     try {
       set({ isLoading: true })
 
-      // Mock wallet connection for build compatibility
-      // In production, uncomment the following and remove mock:
-      /*
-      const starknet = await connect({
-        modalMode: "alwaysAsk",
-        modalTheme: "light",
-      })
+      // Connect to Starknet wallet using get-starknet
+      const starknet = await connect() as any
 
       if (!starknet) {
-        throw new Error("No wallet found")
+        throw new Error("No wallet found or user cancelled connection")
       }
 
-      await starknet.enable()
-
-      if (starknet.isConnected) {
-        const walletAddress = starknet.selectedAddress
-        
+      // Request wallet connection and get account info
+      const walletAddress = starknet.account?.address || starknet.selectedAddress
+      
+      if (walletAddress) {
         // Get local high score as fallback
         const localHighScore = getLocalHighScore(walletAddress)
         
@@ -233,21 +227,11 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
         // Fetch on-chain data
         const { refreshUserData } = get()
         await refreshUserData()
+
+        console.log(`Wallet connected: ${walletAddress}`)
+      } else {
+        throw new Error("Wallet connection failed - no account found")
       }
-      */
-
-      // Mock connection for build compatibility
-      const mockWalletAddress = "0x1234567890abcdef1234567890abcdef12345678"
-      const localHighScore = getLocalHighScore(mockWalletAddress)
-      
-      set({
-        isConnected: true,
-        walletAddress: mockWalletAddress,
-        isLoading: false,
-        userHighScore: localHighScore,
-      })
-
-      console.log("Mock wallet connected for build compatibility")
       
     } catch (error) {
       console.error("Failed to connect wallet:", error)
@@ -257,12 +241,15 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
         isLoading: false,
         userHighScore: 0,
       })
+      
+      // Re-throw error for UI feedback
+      throw error
     }
   },
 
   disconnectWallet: async () => {
     try {
-      // await disconnect({ clearLastWallet: true })
+      await disconnect({ clearLastWallet: true })
       set({
         isConnected: false,
         walletAddress: null,
@@ -273,6 +260,15 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
       })
     } catch (error) {
       console.error("Failed to disconnect wallet:", error)
+      // Even if disconnect fails, clear the local state
+      set({
+        isConnected: false,
+        walletAddress: null,
+        transactionStatus: null,
+        playerBestScore: 0,
+        playerStats: null,
+        userHighScore: 0,
+      })
     }
   },
 
