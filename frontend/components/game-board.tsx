@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
+import { motion } from "framer-motion"
 import { Tile } from "./tile"
 
 interface GameBoardProps {
@@ -55,17 +56,20 @@ export function GameBoard({ board, onMove, disabled }: GameBoardProps) {
 
   return (
     <div
-      className="bg-gradient-to-br from-indigo-200 w-fit to-purple-200 rounded-2xl shadow-lg select-none p-3 flex items-center justify-center"
+      className="bg-gradient-to-br from-indigo-200 to-purple-200 rounded-2xl shadow-xl select-none p-4 w-fit mx-auto border border-indigo-300/30"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="grid grid-cols-4 gap-1 place-items-center">
+      <motion.div 
+        className="grid grid-cols-4 gap-2 place-items-center"
+        layout
+      >
         {board.map((row, rowIndex) =>
           row.map((value, colIndex) => (
             <Tile key={`${rowIndex}-${colIndex}`} value={value} position={{ row: rowIndex, col: colIndex }} />
           )),
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 "use client"
 
 import { create } from "zustand"
+import { useStarknetStore } from "./starknet-store"
 
 interface GameState {
   board: number[][]
@@ -9,12 +10,15 @@ interface GameState {
   moves: number
   gameOver: boolean
   won: boolean
+  isWalletConnected: boolean // Track wallet connection status
   initializeGame: () => void
   moveUp: () => void
   moveDown: () => void
   moveLeft: () => void
   moveRight: () => void
   resetGame: () => void
+  setBestScore: (score: number) => void // Method to update best score from wallet
+  handleGameEnd: (finalScore: number, moves: number) => Promise<void> // Handle game completion
 }
 
 const createEmptyBoard = (): number[][] => {
@@ -123,10 +127,11 @@ const checkWin = (board: number[][]): boolean => {
 export const useGameStore = create<GameState>((set, get) => ({
   board: createEmptyBoard(),
   score: 0,
-  bestScore: Number.parseInt(localStorage?.getItem("zk2048-best") || "0"),
+  bestScore: typeof window !== 'undefined' ? Number.parseInt(localStorage.getItem("zk2048-best") || "0") : 0,
   moves: 0,
   gameOver: false,
   won: false,
+  isWalletConnected: false,
 
   initializeGame: () => {
     let board = createEmptyBoard()
@@ -139,6 +144,43 @@ export const useGameStore = create<GameState>((set, get) => ({
       gameOver: false,
       won: false,
     })
+  },
+
+  setBestScore: (score: number) => {
+    set({ bestScore: score })
+  },
+
+  handleGameEnd: async (finalScore: number, moves: number) => {
+    const starknetStore = useStarknetStore.getState()
+    
+    try {
+      if (starknetStore.isConnected) {
+        // Save to blockchain
+        await starknetStore.markGameCompleted(finalScore, moves)
+        
+        // Update local best score with wallet-specific score
+        set({ bestScore: starknetStore.userHighScore })
+      } else {
+        // Fallback to local storage if wallet not connected
+        const currentBest = get().bestScore
+        if (finalScore > currentBest) {
+          if (typeof window !== 'undefined') {
+            localStorage.setItem("zk2048-best", finalScore.toString())
+          }
+          set({ bestScore: finalScore })
+        }
+      }
+    } catch (error) {
+      console.error("Failed to handle game end:", error)
+      // Fallback to local storage on error
+      const currentBest = get().bestScore
+      if (finalScore > currentBest) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem("zk2048-best", finalScore.toString())
+        }
+        set({ bestScore: finalScore })
+      }
+    }
   },
 
   moveLeft: () => {
@@ -154,103 +196,105 @@ export const useGameStore = create<GameState>((set, get) => ({
     const isGameOver = checkGameOver(newBoard)
     const hasWon = checkWin(newBoard)
 
-    const bestScore = Math.max(get().bestScore, newScore)
-    if (bestScore > get().bestScore) {
-      localStorage?.setItem("zk2048-best", bestScore.toString())
-    }
-
     set({
       board: newBoard,
       score: newScore,
-      bestScore,
       moves: newMoves,
       gameOver: isGameOver,
       won: hasWon,
     })
+
+    // Handle game end if applicable
+    if (isGameOver || hasWon) {
+      get().handleGameEnd(newScore, newMoves)
+    }
   },
 
   moveRight: () => {
-    const { board } = get()
+    const { board, score: currentScore, moves, gameOver, won } = get()
+    if (gameOver || won) return
+
     let rotatedBoard = rotateBoard(rotateBoard(board))
     const result = moveLeft(rotatedBoard)
     if (!result.moved) return
 
     rotatedBoard = rotateBoard(rotateBoard(result.board))
     const newBoard = addRandomTile(rotatedBoard)
-    const newScore = get().score + result.score
-    const newMoves = get().moves + 1
+    const newScore = currentScore + result.score
+    const newMoves = moves + 1
     const isGameOver = checkGameOver(newBoard)
     const hasWon = checkWin(newBoard)
-
-    const bestScore = Math.max(get().bestScore, newScore)
-    if (bestScore > get().bestScore) {
-      localStorage?.setItem("zk2048-best", bestScore.toString())
-    }
 
     set({
       board: newBoard,
       score: newScore,
-      bestScore,
       moves: newMoves,
       gameOver: isGameOver,
       won: hasWon,
     })
+
+    // Handle game end if applicable
+    if (isGameOver || hasWon) {
+      get().handleGameEnd(newScore, newMoves)
+    }
   },
 
   moveUp: () => {
-    const { board } = get()
+    const { board, score: currentScore, moves, gameOver, won } = get()
+    if (gameOver || won) return
+
     let rotatedBoard = rotateBoard(rotateBoard(rotateBoard(board)))
     const result = moveLeft(rotatedBoard)
     if (!result.moved) return
 
     rotatedBoard = rotateBoard(result.board)
     const newBoard = addRandomTile(rotatedBoard)
-    const newScore = get().score + result.score
-    const newMoves = get().moves + 1
+    const newScore = currentScore + result.score
+    const newMoves = moves + 1
     const isGameOver = checkGameOver(newBoard)
     const hasWon = checkWin(newBoard)
-
-    const bestScore = Math.max(get().bestScore, newScore)
-    if (bestScore > get().bestScore) {
-      localStorage?.setItem("zk2048-best", bestScore.toString())
-    }
 
     set({
       board: newBoard,
       score: newScore,
-      bestScore,
       moves: newMoves,
       gameOver: isGameOver,
       won: hasWon,
     })
+
+    // Handle game end if applicable
+    if (isGameOver || hasWon) {
+      get().handleGameEnd(newScore, newMoves)
+    }
   },
 
   moveDown: () => {
-    const { board } = get()
+    const { board, score: currentScore, moves, gameOver, won } = get()
+    if (gameOver || won) return
+
     let rotatedBoard = rotateBoard(board)
     const result = moveLeft(rotatedBoard)
     if (!result.moved) return
 
     rotatedBoard = rotateBoard(rotateBoard(rotateBoard(result.board)))
     const newBoard = addRandomTile(rotatedBoard)
-    const newScore = get().score + result.score
-    const newMoves = get().moves + 1
+    const newScore = currentScore + result.score
+    const newMoves = moves + 1
     const isGameOver = checkGameOver(newBoard)
     const hasWon = checkWin(newBoard)
-
-    const bestScore = Math.max(get().bestScore, newScore)
-    if (bestScore > get().bestScore) {
-      localStorage?.setItem("zk2048-best", bestScore.toString())
-    }
 
     set({
       board: newBoard,
       score: newScore,
-      bestScore,
       moves: newMoves,
       gameOver: isGameOver,
       won: hasWon,
     })
+
+    // Handle game end if applicable
+    if (isGameOver || hasWon) {
+      get().handleGameEnd(newScore, newMoves)
+    }
   },
 
   resetGame: () => {

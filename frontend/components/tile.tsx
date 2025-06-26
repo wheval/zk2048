@@ -10,31 +10,35 @@ interface TileProps {
 export function Tile({ value, position }: TileProps) {
   const getTileColor = (value: number) => {
     const colors: { [key: number]: string } = {
-      2: "bg-blue-100 text-blue-800 border-blue-200",
-      4: "bg-green-100 text-green-800 border-green-200",
-      8: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      16: "bg-orange-100 text-orange-800 border-orange-200",
-      32: "bg-red-100 text-red-800 border-red-200",
-      64: "bg-purple-100 text-purple-800 border-purple-200",
-      128: "bg-pink-100 text-pink-800 border-pink-200 text-lg",
-      256: "bg-indigo-100 text-indigo-800 border-indigo-200 text-lg",
-      512: "bg-teal-100 text-teal-800 border-teal-200 text-lg",
-      1024: "bg-cyan-100 text-cyan-800 border-cyan-200 text-sm",
-      2048: "bg-gradient-to-r from-purple-400 to-pink-400 text-white border-purple-300 text-sm font-bold shadow-lg",
+      2: "bg-gradient-to-br from-blue-50 to-blue-100 text-blue-900 border-blue-200/50",
+      4: "bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-900 border-emerald-200/50",
+      8: "bg-gradient-to-br from-amber-50 to-amber-100 text-amber-900 border-amber-200/50",
+      16: "bg-gradient-to-br from-orange-100 to-orange-200 text-orange-900 border-orange-300/50",
+      32: "bg-gradient-to-br from-red-100 to-red-200 text-red-900 border-red-300/50",
+      64: "bg-gradient-to-br from-purple-100 to-purple-200 text-purple-900 border-purple-300/50",
+      128: "bg-gradient-to-br from-pink-200 to-pink-300 text-pink-900 border-pink-400/50 text-lg font-semibold",
+      256: "bg-gradient-to-br from-indigo-200 to-indigo-300 text-indigo-900 border-indigo-400/50 text-lg font-semibold",
+      512: "bg-gradient-to-br from-teal-200 to-teal-300 text-teal-900 border-teal-400/50 text-lg font-semibold",
+      1024: "bg-gradient-to-br from-cyan-300 to-cyan-400 text-cyan-900 border-cyan-500/50 text-sm font-bold",
+      2048: "bg-gradient-to-br from-purple-400 via-pink-400 to-purple-500 text-white border-purple-300/50 text-sm font-bold shadow-xl animate-pulse",
     }
-    return colors[value] || "bg-gray-100 text-gray-800 border-gray-200 text-sm"
+    return colors[value] || "bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 border-gray-200/50 text-sm"
   }
 
   if (value === 0) {
-    return <div className="w-16 h-16 bg-white/30 rounded-lg flex items-center justify-center"></div>
+    return <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/40 rounded-xl flex items-center justify-center border border-white/50"></div>
   }
 
   return (
     <motion.div
-      initial={{ scale: 0 }}
-      animate={{ scale: 1 }}
-      transition={{ duration: 0.15 }}
-      className={`w-16 h-16 rounded-lg flex items-center justify-center font-bold border-2 shadow-sm ${getTileColor(value)}`}
+      layout
+      transition={{ 
+        type: "spring",
+        damping: 25,
+        stiffness: 300,
+        duration: 0.25
+      }}
+      className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center font-bold border shadow-md ${getTileColor(value)}`}
     >
       {value}
     </motion.div>

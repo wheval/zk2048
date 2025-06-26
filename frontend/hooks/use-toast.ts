@@ -192,3 +192,19 @@ function useToast() {
 }
 
 export { useToast, toast }
+
+export interface Toast {
+  id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: ToastActionElement
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+// Add new toast types for Starknet transactions
+export interface TransactionToast extends Toast {
+  type: "transaction"
+  status: "pending" | "accepted" | "failed"
+  txHash?: string
+}
