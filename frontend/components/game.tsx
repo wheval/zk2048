@@ -67,10 +67,10 @@ export function Game() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col items-center">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-6xl font-bold text-indigo-600 mb-2">2048</h1>
+        <h1 className="text-6xl font-bold text-indigo-600 mb-2">zk2048</h1>
         <p className="text-indigo-500 text-lg">Powered by Starknet</p>
       </div>
 
@@ -102,7 +102,7 @@ export function Game() {
       </div>
 
       {/* Bottom Info */}
-      <div className="bg-white rounded-xl p-4 shadow-lg flex justify-between items-center">
+      <div className="bg-white rounded-xl gap-x-3 p-4 shadow-lg flex justify-between items-center">
         <span className="text-gray-600 font-medium">Moves: {moves}</span>
         <span className="text-gray-500 text-sm">Use arrow keys or swipe to play</span>
       </div>

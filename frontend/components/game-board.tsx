@@ -55,7 +55,7 @@ export function GameBoard({ board, onMove, disabled }: GameBoardProps) {
 
   return (
     <div
-      className="bg-gradient-to-br from-indigo-200 to-purple-200 rounded-2xl shadow-lg select-none p-3 flex items-center justify-center"
+      className="bg-gradient-to-br from-indigo-200 w-fit to-purple-200 rounded-2xl shadow-lg select-none p-3 flex items-center justify-center"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
