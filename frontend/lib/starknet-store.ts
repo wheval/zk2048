@@ -291,7 +291,7 @@ const CONTRACT_ABI = [
 
 // Initialize RPC provider
 const provider = new RpcProvider({
-  nodeUrl: constants.NetworkName.SN_SEPOLIA, // Use Sepolia testnet
+  nodeUrl: "https://starknet-sepolia.public.blastapi.io/rpc/v0_7", // Sepolia testnet
 })
 
 // Local storage key for wallet-specific high scores (fallback when offline)
@@ -336,33 +336,56 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
 
       // Connect to Starknet wallet using get-starknet
       const starknet = await connect() as any
+      console.log("Starknet object:", starknet)
 
       if (!starknet) {
         throw new Error("No wallet found or user cancelled connection")
       }
 
-      // Request wallet connection and get account info
-      const walletAddress = starknet.account?.address || starknet.selectedAddress
+      // Enable the wallet to get access to account
+      try {
+        await starknet.enable()
+        console.log("Wallet enabled successfully")
+      } catch (enableError) {
+        console.log("Enable error:", enableError)
+        // Some wallets might not need explicit enable
+      }
+
+      // Get account info - try multiple properties
+      let walletAddress = null
       
-      if (walletAddress) {
-        // Get local high score as fallback
-        const localHighScore = getLocalHighScore(walletAddress)
-        
-        set({
-          isConnected: true,
-          walletAddress,
-          isLoading: false,
-          userHighScore: localHighScore,
-        })
-
-        // Fetch on-chain data
-        const { refreshUserData } = get()
-        await refreshUserData()
-
-        console.log(`Wallet connected: ${walletAddress}`)
-      } else {
+      // Try different ways to get the address
+      if (starknet.selectedAddress) {
+        walletAddress = starknet.selectedAddress
+        console.log("Got address from selectedAddress:", walletAddress)
+      } else if (starknet.account?.address) {
+        walletAddress = starknet.account.address
+        console.log("Got address from account.address:", walletAddress)
+      } else if (starknet.address) {
+        walletAddress = starknet.address
+        console.log("Got address from address:", walletAddress)
+      }
+      
+      if (!walletAddress) {
+        console.log("Available properties:", Object.keys(starknet))
         throw new Error("Wallet connection failed - no account found")
       }
+
+      // Get local high score as fallback
+      const localHighScore = getLocalHighScore(walletAddress)
+      
+      set({
+        isConnected: true,
+        walletAddress,
+        isLoading: false,
+        userHighScore: localHighScore,
+      })
+
+      // Fetch on-chain data
+      const { refreshUserData } = get()
+      await refreshUserData()
+
+      console.log(`Wallet connected: ${walletAddress}`)
       
     } catch (error) {
       console.error("Failed to connect wallet:", error)
@@ -421,8 +444,14 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
       set({ userHighScore: newHighScore })
 
       // Execute actual blockchain transaction
-      const starknet = await connect({ modalMode: "neverAsk" }) as any
-      if (!starknet || !starknet.account) throw new Error("Wallet not available")
+      const starknet = await connect() as any
+      if (!starknet || !starknet.account) {
+        // Try to enable and get account
+        await starknet?.enable()
+        if (!starknet?.account) {
+          throw new Error("Wallet not available")
+        }
+      }
       
       const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, starknet.account as WalletAccount)
       const result = await contract.save_player_score(score, moves)
@@ -466,8 +495,14 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
       set({ userHighScore: newHighScore })
 
       // Execute actual blockchain transaction
-      const starknet = await connect({ modalMode: "neverAsk" }) as any
-      if (!starknet || !starknet.account) throw new Error("Wallet not available")
+      const starknet = await connect() as any
+      if (!starknet || !starknet.account) {
+        // Try to enable and get account
+        await starknet?.enable()
+        if (!starknet?.account) {
+          throw new Error("Wallet not available")
+        }
+      }
       
       const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, starknet.account as WalletAccount)
       const result = await contract.mark_game_completed(finalScore, moves)

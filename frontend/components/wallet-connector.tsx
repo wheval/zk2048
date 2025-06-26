@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Wallet, Trophy, Users, TrendingUp, Loader2 } from "lucide-react"
 
 export function WalletConnector() {
+  const [mounted, setMounted] = useState(false)
   const {
     isConnected,
     walletAddress,
@@ -23,6 +24,11 @@ export function WalletConnector() {
   } = useStarknetStore()
 
   const { setBestScore } = useGameStore()
+
+  // Prevent hydration errors
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Update game store when wallet high score changes
   useEffect(() => {
@@ -62,6 +68,17 @@ export function WalletConnector() {
       default:
         return "bg-gray-500/20 text-gray-700 border-gray-500/30"
     }
+  }
+
+  // Don't render until mounted to prevent hydration errors
+  if (!mounted) {
+    return (
+      <Card className="backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl">
+        <CardContent className="flex items-center justify-center p-6">
+          <Loader2 className="h-6 w-6 animate-spin text-white" />
+        </CardContent>
+      </Card>
+    )
   }
 
   if (!isConnected) {

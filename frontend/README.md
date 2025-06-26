@@ -1,175 +1,105 @@
-# ZK2048 - Starknet Frontend Integration
+# ZK2048 Frontend
 
-A 2048 game with Starknet blockchain integration for on-chain score storage, leaderboards, and wallet-based player sessions.
+A blockchain-enabled 2048 game built with Next.js and Starknet integration.
 
-## 🌟 Features
+## 🎮 Features
 
-- **Wallet Connection**: Connect with Argent X or Braavos wallet
-- **On-chain Score Storage**: Save your game scores to Starknet
-- **Global Leaderboard**: Compete with players worldwide
-- **Real-time Updates**: Live transaction status and leaderboard updates
-- **Player Statistics**: Track your best scores and game history
+- **Classic 2048 Gameplay**: Move tiles and combine numbers to reach 2048
+- **Blockchain Integration**: Connect your Starknet wallet to save high scores on-chain
+- **Leaderboard**: Compete with other players on a global leaderboard
+- **Player Stats**: Track your best scores, moves, and games played
+- **Responsive Design**: Beautiful UI that works on desktop and mobile
 
-## 🚀 Getting Started
+## 🚀 Deployed Contract
+
+The game is connected to a deployed Starknet contract on Sepolia testnet:
+
+**Contract Address**: `0x0489559e3ad7ea6591efb79e0f4a3ff4c7485c8895fce10ebb45fad339fc519d`
+
+## 🔧 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm
-- A Starknet wallet (Argent X or Braavos)
-- Some ETH on Starknet Sepolia testnet for transactions
+- Node.js 18+ and npm/pnpm
+- A Starknet wallet (ArgentX or Braavos)
+- Some ETH on Starknet Sepolia testnet (for gas fees)
 
 ### Installation
 
-1. **Install dependencies:**
    ```bash
+# Install dependencies
+npm install
+# or
    pnpm install
-   ```
 
-2. **Deploy the smart contract first:**
-   ```bash
-   cd ../contract
-   scarb build
-   # Deploy to Starknet (see contract README for details)
-   ```
-
-3. **Update contract configuration:**
-   Edit `lib/contract-config.ts` and update the contract address:
-   ```typescript
-   export const CONTRACT_ADDRESSES = {
-     ZK2048_GAME: "0xYOUR_DEPLOYED_CONTRACT_ADDRESS", // Update this!
-   }
-   ```
-
-4. **Start the development server:**
-   ```bash
+# Run development server
+npm run dev
+# or
    pnpm dev
    ```
 
-## 🎮 How to Play
+Open [http://localhost:3000](http://localhost:3000) to play the game.
 
-1. **Connect Wallet**: Click "Connect" to connect your Starknet wallet
-2. **Play the Game**: Use arrow keys to move tiles and reach 2048
-3. **Save Score**: Click "Save to Starknet" to store your score on-chain
-4. **View Leaderboard**: Check your ranking among all players
-5. **Track Stats**: Monitor your best scores and game history
+## 🎯 How to Play
 
-## 🔧 Architecture
+1. **Local Play**: You can play without connecting a wallet. Scores are saved locally.
 
-### Components Structure
+2. **Blockchain Play**: 
+   - Click "Connect Wallet" to connect your Starknet wallet
+   - Make sure you're on Starknet Sepolia testnet
+   - Your high scores will be saved to the blockchain
+   - View the global leaderboard to see how you rank
 
-- **Game Components**:
-  - `Game`: Main game component with wallet integration
-  - `GameBoard`: The 2048 game board
-  - `WalletStatus`: Wallet connection and player stats
-  - `Leaderboard`: Global player rankings
+3. **Game Controls**:
+   - Use arrow keys or WASD to move tiles
+   - Combine tiles with the same number to reach 2048
+   - Game ends when no more moves are possible
 
-### Hooks
+## 🔗 Blockchain Features
 
-- **`useWallet`**: Wallet connection and player data
-- **`useSaveScore`**: Score saving with transaction handling
-- **`useLeaderboard`**: Leaderboard data and rankings
+### Smart Contract Functions
 
-### State Management
+- **save_player_score**: Save your current game score
+- **mark_game_completed**: Mark a completed game with final score
+- **get_player_best_score**: Retrieve your best score from the blockchain
+- **get_leaderboard**: View top 10 players globally
+- **get_player_stats**: Get detailed player statistics
 
-- **Game Store** (`useGameStore`): 2048 game logic and state
-- **Starknet Store** (`useStarknetStore`): Blockchain interactions
+### On-Chain Data
 
-## 🌐 Smart Contract Integration
+- ✅ Player high scores
+- ✅ Global leaderboard (top 10)
+- ✅ Player statistics (current score, best score, moves)
+- ✅ Game completion tracking
 
-### Contract Functions
+## 🛠 Development
 
-- `save_player_score(score: u256, moves: u256)`: Save game score
-- `get_player_best_score(player: ContractAddress)`: Get player's best score
-- `get_player_stats(player: ContractAddress)`: Get detailed player statistics
-- `get_leaderboard()`: Get top 10 global scores
+### Build
 
-### Events
-
-- `NewHighScore`: Emitted when a player sets a new personal best
-- `GameCompleted`: Emitted when a game session is completed
-- `LeaderboardUpdated`: Emitted when leaderboard rankings change
-
-## 🛠️ Development
-
-### Environment Setup
-
-1. **Install Starknet Dependencies**:
    ```bash
-   pnpm add starknet get-starknet-core
-   ```
+npm run build
+```
 
-2. **Configure Network**:
-   The app is configured to use Starknet Sepolia testnet. Update `lib/contract-config.ts` for different networks.
+### Deploy
 
-### Testing
+The app is deployed automatically to Vercel. Any push to the main branch triggers a new deployment.
 
-- **Game Logic**: Test 2048 game mechanics locally
-- **Wallet Integration**: Test with Starknet wallet in browser
-- **Contract Calls**: Verify smart contract interactions
+## 📝 Technical Details
 
-### Deployment
-
-1. **Build for production**:
-   ```bash
-   pnpm build
-   ```
-
-2. **Deploy to hosting platform** (Vercel, Netlify, etc.)
-
-## 📱 Mobile Support
-
-The game is fully responsive and supports:
-- Touch controls for mobile devices
-- Wallet connection on mobile browsers
-- Optimized UI for small screens
-
-## 🔐 Security
-
-- **Wallet Security**: Only connects to approved Starknet wallets
-- **Transaction Safety**: All transactions require user approval
-- **Data Validation**: Input validation on both frontend and contract
-
-## 🎯 Transaction Flow
-
-1. **Player Action**: Complete a game and click "Save to Starknet"
-2. **Wallet Prompt**: Wallet asks for transaction approval
-3. **Contract Call**: Execute `save_player_score` function
-4. **Confirmation**: Wait for transaction confirmation
-5. **Update UI**: Refresh leaderboard and player stats
-
-## 📊 Error Handling
-
-- **Wallet Not Connected**: Clear prompts to connect wallet
-- **Transaction Failures**: Retry options and error messages
-- **Network Issues**: Graceful fallbacks and status indicators
-
-## 🔄 Real-time Updates
-
-- **Transaction Status**: Live updates during blockchain interactions
-- **Leaderboard Refresh**: Automatic updates after score submissions
-- **Player Stats**: Real-time synchronization with contract data
-
-## 🌍 Network Configuration
-
-Currently configured for **Starknet Sepolia Testnet**:
-- Chain ID: `0x534e5f5345504f4c4941`
-- RPC: Uses public Starknet Sepolia endpoints
-
-## 📝 Notes
-
-- Ensure your contract is deployed before running the frontend
-- Update contract addresses in the configuration file
-- Test with small amounts on testnet before mainnet deployment
-- Keep wallet browser extension updated for best compatibility
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Blockchain**: Starknet (Cairo smart contracts)
+- **State Management**: Zustand
+- **Animations**: Framer Motion
+- **Wallet Integration**: get-starknet-core
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is open source and available under the MIT License. 
+This project is licensed under the MIT License. 
