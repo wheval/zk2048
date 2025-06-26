@@ -46,116 +46,247 @@ interface StarknetState {
 }
 
 // Contract configuration - Update with your deployed contract address
-const CONTRACT_ADDRESS = "0x123456789abcdef" // Replace with your deployed contract address
+const CONTRACT_ADDRESS = "0x0489559e3ad7ea6591efb79e0f4a3ff4c7485c8895fce10ebb45fad339fc519d"
 const CONTRACT_ABI = [
-  {
-    "type": "interface",
-    "name": "IZK2048Game",
-    "items": [
-      {
-        "type": "function",
-        "name": "save_player_score",
-        "inputs": [
-          {
-            "name": "current_score",
-            "type": "core::integer::u32"
-          },
-          {
-            "name": "moves",
-            "type": "core::integer::u32"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "get_player_best_score",
-        "inputs": [
-          {
-            "name": "player",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u32"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_player_stats",
-        "inputs": [
-          {
-            "name": "player",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "(core::integer::u32, core::integer::u32, core::integer::u32)"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_leaderboard",
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u32)>"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "get_leaderboard_position",
-        "inputs": [
-          {
-            "name": "player",
-            "type": "core::starknet::contract_address::ContractAddress"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "core::integer::u32"
-          }
-        ],
-        "state_mutability": "view"
-      },
-      {
-        "type": "function",
-        "name": "mark_game_completed",
-        "inputs": [
-          {
-            "name": "final_score",
-            "type": "core::integer::u32"
-          },
-          {
-            "name": "moves",
-            "type": "core::integer::u32"
-          }
-        ],
-        "outputs": [],
-        "state_mutability": "external"
-      },
-      {
-        "type": "function",
-        "name": "get_total_games_played",
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "core::integer::u32"
-          }
-        ],
-        "state_mutability": "view"
-      }
-    ]
-  }
+  [
+    {
+      "type": "impl",
+      "name": "ZK2048GameImpl",
+      "interface_name": "contract::IZK2048Game"
+    },
+    {
+      "type": "interface",
+      "name": "contract::IZK2048Game",
+      "items": [
+        {
+          "type": "function",
+          "name": "save_player_score",
+          "inputs": [
+            {
+              "name": "current_score",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "moves",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "get_player_best_score",
+          "inputs": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_player_stats",
+          "inputs": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "(core::integer::u32, core::integer::u32, core::integer::u32)"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_leaderboard",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::array::Array::<(core::starknet::contract_address::ContractAddress, core::integer::u32)>"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "get_leaderboard_position",
+          "inputs": [
+            {
+              "name": "player",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "type": "function",
+          "name": "mark_game_completed",
+          "inputs": [
+            {
+              "name": "final_score",
+              "type": "core::integer::u32"
+            },
+            {
+              "name": "moves",
+              "type": "core::integer::u32"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "reset_leaderboard",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "function",
+          "name": "get_total_games_played",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::integer::u32"
+            }
+          ],
+          "state_mutability": "view"
+        }
+      ]
+    },
+    {
+      "type": "constructor",
+      "name": "constructor",
+      "inputs": []
+    },
+    {
+      "type": "event",
+      "name": "contract::ZK2048Game::NewHighScore",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "old_score",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "new_score",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "moves",
+          "type": "core::integer::u32",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "enum",
+      "name": "core::bool",
+      "variants": [
+        {
+          "name": "False",
+          "type": "()"
+        },
+        {
+          "name": "True",
+          "type": "()"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "contract::ZK2048Game::GameCompleted",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "final_score",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "moves",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "is_best_score",
+          "type": "core::bool",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "contract::ZK2048Game::LeaderboardUpdated",
+      "kind": "struct",
+      "members": [
+        {
+          "name": "player",
+          "type": "core::starknet::contract_address::ContractAddress",
+          "kind": "data"
+        },
+        {
+          "name": "score",
+          "type": "core::integer::u32",
+          "kind": "data"
+        },
+        {
+          "name": "position",
+          "type": "core::integer::u8",
+          "kind": "data"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "contract::ZK2048Game::Event",
+      "kind": "enum",
+      "variants": [
+        {
+          "name": "NewHighScore",
+          "type": "contract::ZK2048Game::NewHighScore",
+          "kind": "nested"
+        },
+        {
+          "name": "GameCompleted",
+          "type": "contract::ZK2048Game::GameCompleted",
+          "kind": "nested"
+        },
+        {
+          "name": "LeaderboardUpdated",
+          "type": "contract::ZK2048Game::LeaderboardUpdated",
+          "kind": "nested"
+        }
+      ]
+    }
+  ]
 ]
 
 // Initialize RPC provider
@@ -281,7 +412,7 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
     try {
       set({ isLoading: true, transactionStatus: "pending" })
 
-      // Save to local storage immediately
+      // Save to local storage immediately as fallback
       saveLocalHighScore(walletAddress, score)
       
       // Update local state
@@ -289,18 +420,18 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
       const newHighScore = Math.max(currentUserHighScore, score)
       set({ userHighScore: newHighScore })
 
-      // TODO: Implement actual blockchain transaction
-      // const starknet = await connect({ modalMode: "neverAsk" })
-      // if (!starknet) throw new Error("Wallet not available")
-      // const contract = new Contract(CONTRACT_ABI, contractAddress, starknet.account)
-      // const result = await contract.save_player_score(score, moves)
-      // await provider.waitForTransaction(result.transaction_hash)
-
-      // Mock successful transaction for build compatibility
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate network delay
+      // Execute actual blockchain transaction
+      const starknet = await connect({ modalMode: "neverAsk" }) as any
+      if (!starknet || !starknet.account) throw new Error("Wallet not available")
+      
+      const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, starknet.account as WalletAccount)
+      const result = await contract.save_player_score(score, moves)
+      
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash)
       set({ transactionStatus: "accepted" })
 
-      // Refresh user data
+      // Refresh user data after successful transaction
       const { refreshUserData } = get()
       await refreshUserData()
 
@@ -326,7 +457,7 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
     try {
       set({ isLoading: true, transactionStatus: "pending" })
 
-      // Save to local storage immediately
+      // Save to local storage immediately as fallback
       saveLocalHighScore(walletAddress, finalScore)
       
       // Update local state
@@ -334,18 +465,18 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
       const newHighScore = Math.max(currentUserHighScore, finalScore)
       set({ userHighScore: newHighScore })
 
-      // TODO: Implement actual blockchain transaction
-      // const starknet = await connect({ modalMode: "neverAsk" })
-      // if (!starknet) throw new Error("Wallet not available")
-      // const contract = new Contract(CONTRACT_ABI, contractAddress, starknet.account)
-      // const result = await contract.mark_game_completed(finalScore, moves)
-      // await provider.waitForTransaction(result.transaction_hash)
-
-      // Mock successful transaction for build compatibility
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Execute actual blockchain transaction
+      const starknet = await connect({ modalMode: "neverAsk" }) as any
+      if (!starknet || !starknet.account) throw new Error("Wallet not available")
+      
+      const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, starknet.account as WalletAccount)
+      const result = await contract.mark_game_completed(finalScore, moves)
+      
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash)
       set({ transactionStatus: "accepted" })
 
-      // Refresh user data
+      // Refresh user data after successful transaction
       const { refreshUserData } = get()
       await refreshUserData()
 
@@ -363,24 +494,23 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
 
   fetchLeaderboard: async () => {
     try {
-      const { contractAddress } = get()
+      // Fetch actual leaderboard from contract
+      const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, provider)
+      const result = await contract.get_leaderboard()
       
-      // TODO: Implement actual contract call
-      // const contract = new Contract(CONTRACT_ABI, contractAddress, provider)
-      // const result = await contract.get_leaderboard()
-      
-      // Mock leaderboard data for build compatibility
-      const mockLeaderboard: LeaderboardEntry[] = [
-        { player: "0x1234...5678", score: 50000, moves: 1200 },
-        { player: "0x2345...6789", score: 35000, moves: 1500 },
-        { player: "0x3456...789a", score: 28000, moves: 1800 },
-        { player: "0x4567...89ab", score: 22000, moves: 2000 },
-        { player: "0x5678...9abc", score: 18000, moves: 2200 },
-      ]
+      // Convert contract result to leaderboard format
+      const leaderboard: LeaderboardEntry[] = result.map((entry: any) => ({
+        player: entry[0], // ContractAddress
+        score: Number(entry[1]), // u32 score
+        moves: 0, // Contract doesn't store moves in leaderboard, could enhance later
+      }))
 
-      set({ leaderboard: mockLeaderboard })
+      set({ leaderboard })
     } catch (error) {
       console.error("Failed to fetch leaderboard:", error)
+      
+      // Fallback to empty leaderboard on error
+      set({ leaderboard: [] })
     }
   },
 
@@ -389,14 +519,16 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
     if (!isConnected || !walletAddress) return
 
     try {
-      // TODO: Implement actual contract call
-      // const contract = new Contract(CONTRACT_ABI, contractAddress, provider)
-      // const result = await contract.get_player_best_score(walletAddress)
-      // set({ playerBestScore: Number(result) })
-
-      // Use local storage as fallback
+      // Fetch actual player best score from contract
+      const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, provider)
+      const result = await contract.get_player_best_score(walletAddress)
+      const onChainScore = Number(result)
+      
+      // Use the higher of on-chain score or local score
       const localScore = getLocalHighScore(walletAddress)
-      set({ playerBestScore: localScore, userHighScore: localScore })
+      const bestScore = Math.max(onChainScore, localScore)
+      
+      set({ playerBestScore: bestScore, userHighScore: bestScore })
     } catch (error) {
       console.error("Failed to fetch player best score:", error)
       // Fallback to local storage
@@ -410,22 +542,31 @@ export const useStarknetStore = create<StarknetState>((set, get) => ({
     if (!isConnected || !walletAddress) return
 
     try {
-      // TODO: Implement actual contract call
-      // const contract = new Contract(CONTRACT_ABI, contractAddress, provider)
-      // const result = await contract.get_player_stats(walletAddress)
+      // Fetch actual player stats from contract
+      const contract = new Contract(CONTRACT_ABI, CONTRACT_ADDRESS, provider)
+      const result = await contract.get_player_stats(walletAddress)
       
-      // Mock player stats for build compatibility
-      const localScore = getLocalHighScore(walletAddress)
-      const mockStats: PlayerStats = {
+      // Contract returns (current_score, best_score, moves) as tuple
+      const playerStats: PlayerStats = {
+        current_score: Number(result[0]),
+        best_score: Number(result[1]),
+        moves: Number(result[2]),
+        games_played: 1, // Contract doesn't track games_played separately
+      }
+
+      set({ playerStats })
+    } catch (error) {
+      console.error("Failed to fetch player stats:", error)
+      
+      // Fallback to local storage
+      const localScore = getLocalHighScore(get().walletAddress!)
+      const fallbackStats: PlayerStats = {
         current_score: 0,
         best_score: localScore,
         moves: 0,
-        games_played: 5,
+        games_played: 0,
       }
-
-      set({ playerStats: mockStats })
-    } catch (error) {
-      console.error("Failed to fetch player stats:", error)
+      set({ playerStats: fallbackStats })
     }
   },
 
